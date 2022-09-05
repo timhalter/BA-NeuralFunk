@@ -16,3 +16,4 @@ This repository cointains all code-based files and documentation which contribut
 * [The Variational Autoencoder as a Two-Player Game — Part II](https://towardsdatascience.com/the-variational-autoencoder-as-a-two-player-game-part-ii-b80d48512f46)
 * [The Variational Autoencoder as a Two-Player Game — Part III](https://towardsdatascience.com/the-variational-autoencoder-as-a-two-player-game-part-iii-d8d56c301600)
 * [Improved Variational Inference with Inverse Autoregressive Flow](https://arxiv.org/pdf/1606.04934.pdf)
+* [Understanding Variational Autoencoders (VAEs)](https://towardsdatascience.com/understanding-variational-autoencoders-vaes-f70510919f73)
