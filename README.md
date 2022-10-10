@@ -14,14 +14,14 @@ BA_NeuralFunk
 │
 data
 │
+└───logdir
+│
 └───samples
 │   │
 │   └───dataset
 │   │   │   sample1.wav
 │   │   │   sample1.npy
 │   │   │   ...
-│   │
-│   └───generated
 │   │
 │   └───raw_samples
 
