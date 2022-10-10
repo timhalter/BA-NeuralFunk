@@ -30,6 +30,11 @@ data
 ```python preprocessing.py --data_dir <datadir> --target_dir <targetdir>```
 ## Training
 ```python train.py --logdir <logdir>```
+## Encode audio
+* Single file:\
+```python encode_and_reconstruct.py --audio_file <filename>```
+* Full dataset:\
+```python encode_and_reconstruct.py -logdir <logdir> --encode_full true```
 ## Generating samples
 * Sampling from latent space:\
 ```python generate.py --logdir <logdir> --file_out <filename>```
@@ -39,7 +44,7 @@ data
 ```python generate.py --logdir <logdir> --file_in <list_of_files> --file_out <filename>```
 
 
-&emsp; 
+
 
 ### Given Work
 * [Neural Funk Article](https://towardsdatascience.com/neuralfunk-combining-deep-learning-with-sound-design-91935759d628) 
