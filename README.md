@@ -19,6 +19,11 @@ BA_NeuralFunk
 │   │   └───raw_samples
 
 ```
+## Samples
+Download and save in a raw_samples directory (see project structure above)
+* [Drumkit](https://s3-ap-northeast-1.amazonaws.com/codepen-dev/drumkit_dataset.zip)
+* [NeuroFunk Sample Pack](https://www.ghosthack.de/free_sample_packs/neurofunk-sample-pack/)
+
 ## Preprocessing
 ```python preprocessing.py --data_dir <datadir> --target_dir <targetdir>```
 ## Training
