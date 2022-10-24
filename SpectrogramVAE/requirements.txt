@@ -1,0 +1,7 @@
+numpy
+joblib
+seaborn
+librosa
+matplotlib
+tensorflow==1.15
+protobuf==3.20.*
