@@ -23,7 +23,7 @@ MELSPEC_BANDS = param['MELSPEC_BANDS']
 sample_secs = param['sample_secs']
 num_samples_dataset = int(sample_secs * SAMPLING_RATE)
 
-logdir = './logdir'
+logdir = '../data/logdir'
 max_checkpoints = 5
 num_steps = 10000
 checkpoint_every = 500
