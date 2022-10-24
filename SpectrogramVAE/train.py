@@ -12,7 +12,7 @@ import json
 from spec_reader import *
 from model_iaf import *
 
-logdir = './logdir'
+logdir = '../data/logdir'
 max_checkpoints = 5
 num_steps = 10000
 checkpoint_every = 500

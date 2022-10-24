@@ -18,8 +18,8 @@ import soundfile as sf
 from griffin_lim import griffin_lim
 from sklearn.manifold import TSNE
 
-data_dir = '../../data/samples/raw_samples'
-target_dir = '../../data/samples/dataset/'
+data_dir = '../data/samples/raw_samples'
+target_dir = '../data/samples/dataset/'
 N_FFT = 1024
 HOP_LENGTH = 256 
 SAMPLING_RATE = 16000
