@@ -15,47 +15,6 @@ def create_bias_variable(name, shape):
     initializer = tf.constant_initializer(value=0.001, dtype=tf.float32)
     return tf.Variable(initializer(shape=shape), name)
 
-
-# def upsample(net, name, stride, mode='ZEROS'):
-#     """
-#     Imitate reverse operation of Max-Pooling by either placing original max values
-#     into a fixed postion of upsampled cell:
-#     [0.9] =>[[.9, 0],   (stride=2)
-#            [ 0, 0]]
-#     or copying the value into each cell:
-#     [0.9] =>[[.9, .9],  (stride=2)
-#            [ .9, .9]]
-#     :param net: 4D input tensor with [batch_size, width, heights, channels] axis
-#     :param stride:
-#     :param mode: string 'ZEROS' or 'COPY' indicating which value to use for undefined cells
-#     :return:  4D tensor of size [batch_size, width*stride, heights*stride, channels]
-#     """
-#     assert mode in ['COPY', 'ZEROS']
-#     with tf.name_scope('Upsampling'):
-#         net = _upsample_along_axis(net, 2, stride[1], mode=mode)
-#         net = _upsample_along_axis(net, 1, stride[0], mode=mode)
-#         return net
-
-
-# def _upsample_along_axis(volume, axis, stride, mode='ZEROS'):
-#     shape = volume.get_shape().as_list()
-
-#     assert mode in ['COPY', 'ZEROS']
-#     assert 0 <= axis < len(shape)
-
-#     target_shape = shape[:]
-#     target_shape[axis] *= stride
-
-#     print(volume.dtype)
-#     print(shape)
-
-#     padding = tf.zeros(shape, dtype=volume.dtype) if mode == 'ZEROS' else volume
-#     parts = [volume] + [padding for _ in range(stride - 1)]
-#     volume = tf.concat(parts, min(axis+1, len(shape)-1))
-
-#     volume = tf.reshape(volume, target_shape)
-#     return volume
-
 def upsample(value, name, factor=[2, 2]):
     size = [int(value.shape[1] * factor[0]), int(value.shape[2] * factor[1])]
     with tf.name_scope(name):
@@ -79,9 +38,7 @@ def two_d_conv(value, filter_, pool_kernel=[2, 2], name='two_d_conv'):
 
 def two_d_deconv(value, filter_, deconv_shape, pool_kernel=[2, 2], name='two_d_conv'):
     out = upsample2(value, 'unpool', deconv_shape)
-    # print(out)
     out = tf.nn.conv2d_transpose(out, filter_, output_shape=deconv_shape, strides=[1, 1, 1, 1], padding='SAME')
-    # print(out)
 
     return out
 
@@ -188,8 +145,6 @@ class VAEModel(object):
 
                             current['filter'] = create_variable("filter",
                                                                 [3, 3, channels_out, channels_in])
-                            #                             current['bias'] = create_bias_variable("bias",
-                            #                                                 [channels_out])
                             var['decoder_deconv'].append(current)
 
         return var
@@ -199,16 +154,11 @@ class VAEModel(object):
         # Do encoder calculation
         encoder_hidden = input_batch
         for l in range(self.layers_enc):
-            # print(encoder_hidden)
             encoder_hidden = two_d_conv(encoder_hidden, self.variables['encoder_conv'][l]['filter'],
                                         self.param['max_pooling'][l])
             encoder_hidden = self.activation_conv(encoder_hidden)
 
-        # print(encoder_hidden)
-
         encoder_hidden = tf.reshape(encoder_hidden, [-1, self.conv_out_units])
-
-        # print(encoder_hidden)
 
         # Additional non-linearity between encoder hidden state and prediction of mu_0,sigma_0
         mu_logvar_hidden = tf.nn.dropout(self.activation(tf.matmul(encoder_hidden,
@@ -216,14 +166,10 @@ class VAEModel(object):
                                                          + self.variables['encoder_fc']['b_z0']),
                                          keep_prob=keep_prob)
 
-        # print(mu_logvar_hidden)
-
         encoder_mu = tf.add(tf.matmul(mu_logvar_hidden, self.variables['encoder_fc']['W_mu']),
                             self.variables['encoder_fc']['b_mu'], name='ZMu')
         encoder_logvar = tf.add(tf.matmul(mu_logvar_hidden, self.variables['encoder_fc']['W_logvar']),
                                 self.variables['encoder_fc']['b_logvar'], name='ZLogVar')
-
-        # print(encoder_mu)
 
         # Convert log variance into standard deviation
         encoder_std = tf.exp(0.5 * encoder_logvar)
@@ -237,21 +183,16 @@ class VAEModel(object):
             z0 = tf.identity(tf.add(encoder_mu, tf.multiply(encoder_std, epsilon),
                                     name='LatentZ0'))
 
-        # print(z0)
-
         # Fully connected
         decoder_hidden = tf.nn.dropout(self.activation(tf.matmul(z0, self.variables['decoder_fc']['W_z'])
                                                        + self.variables['decoder_fc']['b_z']),
                                        keep_prob=keep_prob)
-
-        # print(decoder_hidden)
 
         # Reshape
         decoder_hidden = tf.reshape(decoder_hidden, [-1, self.conv_out_shape[0], self.conv_out_shape[1],
                                                      self.param['conv_channels'][-1]])
 
         for l in range(self.layers_enc):
-            # print(decoder_hidden)
 
             pool_kernel = self.param['max_pooling'][-1 - l]
             decoder_hidden = two_d_deconv(decoder_hidden, self.variables['decoder_deconv'][l]['filter'],
@@ -261,9 +202,6 @@ class VAEModel(object):
 
         decoder_output = tf.nn.sigmoid(decoder_hidden)
 
-        # print(decoder_output)
-
-        # return decoder_output, encoder_hidden, encoder_logvar, encoder_std
         return decoder_output, encoder_mu, encoder_logvar, encoder_std
 
     def loss(self,
@@ -274,8 +212,6 @@ class VAEModel(object):
         with tf.name_scope(name):
             output, encoder_mu, encoder_logvar, encoder_std = self._create_network(input_batch)
 
-            # loss=tf.reduce_min(encoder_std)
-
             loss_latent = tf.identity(-0.5 * tf.reduce_sum(1 + encoder_logvar
                                                            - tf.square(encoder_mu)
                                                            - tf.square(encoder_std), 1), name='LossLatent')
@@ -284,10 +220,7 @@ class VAEModel(object):
                                                              + (1 - input_batch) * tf.log(1e-8 + 1 - output),
                                                              [1, 2]), name='LossReconstruction')
 
-            # loss_reconstruction = tf.reduce_mean(tf.pow(input_batch - output, 2))
-
             loss = tf.reduce_mean(loss_reconstruction + beta*loss_latent, name='Loss')
-            # loss = tf.reduce_mean(loss_reconstruction, name='Loss')
 
             tf.summary.scalar('loss', loss)
             tf.summary.scalar('loss_rec', tf.reduce_mean(loss_reconstruction))

@@ -60,8 +60,6 @@ class SpectrogramReader(object):
 
 def load_specs(filename='dataset.pkl', return_filenames=False):
     print('Loading dataset.')
-    #     with open('dataset.pkl', 'rb') as handle:
-    #         dataset = pkl.load(handle)
 
     dataset = joblib.load(filename)
 

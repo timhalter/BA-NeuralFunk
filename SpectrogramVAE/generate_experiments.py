@@ -3,8 +3,6 @@ import random
 import re
 import shlex
 import subprocess
-
-import numpy as np
 import preprocessing
 
 def get_arguments():

@@ -119,8 +119,6 @@ class VAEModel(object):
 
                             current['filter'] = create_variable("filter",
                                                                 [3, 3, channels_in, channels_out])
-                            #                             current['bias'] = create_bias_variable("bias",
-                            #                                               [channels_out])
                             var['encoder_conv'].append(current)
 
                 with tf.compat.v1.variable_scope('fully_connected'):
@@ -213,8 +211,6 @@ class VAEModel(object):
 
                             current['filter'] = create_variable("filter",
                                                                 [3, 3, channels_out, channels_in])
-                            #                             current['bias'] = create_bias_variable("bias",
-                            #                                                 [channels_out])
                             var['decoder_deconv'].append(current)
 
         return var
@@ -227,16 +223,11 @@ class VAEModel(object):
         # Do encoder calculation
         encoder_hidden = input_batch
         for l in range(self.layers_enc):
-            # print(encoder_hidden)
             encoder_hidden = two_d_conv(encoder_hidden, self.variables['encoder_conv'][l]['filter'],
                                         self.param['max_pooling'][l])
             encoder_hidden = self.activation_conv(encoder_hidden)
 
-        # print(encoder_hidden)
-
         encoder_hidden = tf.reshape(encoder_hidden, [-1, self.conv_out_units])
-
-        # print(encoder_hidden)
 
         # Additional non-linearity between encoder hidden state and prediction of mu_0,sigma_0
         mu_logvar_hidden = tf.nn.dropout(self.activation(tf.matmul(encoder_hidden,
@@ -244,14 +235,10 @@ class VAEModel(object):
                                                          + self.variables['encoder_fc']['b_z0']),
                                          rate=1 - keep_prob)
 
-        # print(mu_logvar_hidden)
-
         encoder_mu = tf.add(tf.matmul(mu_logvar_hidden, self.variables['encoder_fc']['W_mu']),
                             self.variables['encoder_fc']['b_mu'], name='ZMu')
         encoder_logvar = tf.add(tf.matmul(mu_logvar_hidden, self.variables['encoder_fc']['W_logvar']),
                                 self.variables['encoder_fc']['b_logvar'], name='ZLogVar')
-
-        # print(encoder_mu)
 
         # Convert log variance into standard deviation
         encoder_std = tf.exp(0.5 * encoder_logvar)
@@ -306,9 +293,6 @@ class VAEModel(object):
                 ms = tf.matmul(nf_hidden_nl, W_flow_params) + b_flow_params
 
                 # Split into individual components
-                # m_list[j], s_list[j] = tf.split_v(value=ms,
-                #                    size_splits=[1,1],
-                #                    split_dim=1)
                 m_list[j], s_list[j] = tf.split(value=ms,
                                                 num_or_size_splits=[1, 1],
                                                 axis=1)
@@ -343,15 +327,11 @@ class VAEModel(object):
                                                        + self.variables['decoder_fc']['b_z']),
                                        rate=1-keep_prob)
 
-        # print(decoder_hidden)
-
         # Reshape
         decoder_hidden = tf.reshape(decoder_hidden, [-1, self.conv_out_shape[0], self.conv_out_shape[1],
                                                      self.param['conv_channels'][-1]])
 
         for l in range(self.layers_enc):
-            # print(decoder_hidden)
-
             pool_kernel = self.param['max_pooling'][-1 - l]
             decoder_hidden = two_d_deconv(decoder_hidden, self.variables['decoder_deconv'][l]['filter'],
                                           self.param['deconv_shape'][l], pool_kernel)
@@ -360,9 +340,6 @@ class VAEModel(object):
 
         decoder_output = tf.nn.sigmoid(decoder_hidden)
 
-        # print(decoder_output)
-
-        # return decoder_output, encoder_hidden, encoder_logvar, encoder_std
         return decoder_output, encoder_mu, encoder_logvar, encoder_std, epsilon, z, nf_sigma
 
     def loss(self,
@@ -377,19 +354,12 @@ class VAEModel(object):
             loss_latent = tf.identity(div, name='LossLatent')
             print(loss_latent)
 
-            # loss_latent = tf.identity(-0.5 * tf.reduce_sum(1 + encoder_logvar
-            #                                                - tf.square(encoder_mu)
-            #                                                - tf.square(encoder_std), 1), name='LossLatent')
-
             print(input_batch)
             loss_reconstruction = tf.identity(-tf.reduce_sum(input_batch * tf.log(1e-8 + output)
                                                              + (1 - input_batch) * tf.log(1e-8 + 1 - output),
                                                              [1,2]), name='LossReconstruction')
 
-            # loss_reconstruction = tf.reduce_mean(tf.pow(input_batch - output, 2))
-
             loss = tf.reduce_mean(loss_reconstruction + beta*loss_latent, name='Loss')
-            # loss = tf.reduce_mean(loss_reconstruction, name='Loss')
 
             tf.summary.scalar('loss', loss)
             tf.summary.scalar('loss_rec', tf.reduce_mean(loss_reconstruction))

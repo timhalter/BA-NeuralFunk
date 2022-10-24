@@ -3,9 +3,6 @@ import os
 from shutil import copyfile
 import sys
 import time
-import joblib
-from random import shuffle
-import numpy as np
 import argparse
 import json
 
@@ -116,7 +113,6 @@ def main():
 
     # Load data
     melspecs = load_specs()
-    # melspecs = 80.0*(np.random.random((10000,128,126))-1.0)
 
     # Create coordinator.
     coord = tf.train.Coordinator()
@@ -174,9 +170,6 @@ def main():
     try:
         for step in range(saved_global_step + 1, num_steps):
             start_time = time.time()
-
-            # loss_value = sess.run([loss])[0]
-            # print(loss_value)
             summary, loss_value, _ = sess.run([summaries, loss, optim])
 
             writer.add_summary(summary, step)

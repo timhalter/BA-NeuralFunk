@@ -193,7 +193,6 @@ def main():
                 # Find position where it should go
                 for m in range(len(similar_files)):
                     if dist < distances[m]:
-                        # print(f'{k*batch_size+j},{k},{j},{m} Inserting Distance: {dist}; File: {audio_files[k*batch_size+j]}')
                         similar_files.insert(m, audio_files[k * batch_size + j])
                         distances.insert(m, dist)
                         if m == 0:

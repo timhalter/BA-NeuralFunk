@@ -8,7 +8,7 @@ import argparse
 from griffin_lim import *
 from model_iaf import *
 from util import *
-
+import soundfile as sf
 import librosa
 import librosa.display
 import matplotlib.pyplot as plt
@@ -172,7 +172,6 @@ def main():
     output_mean = sess.run(out_mean)
 
     spec_out = (np.squeeze(output_mean[0])-1.0)*80.0
-    # spec_out1 = (np.squeeze(output[0])-1.0)*80.0
 
     # Plot
     plt.figure(figsize=(10, (num_files+1)*4))
@@ -198,7 +197,6 @@ def main():
     plt.close()
 
     # Reconstruct audio
-    import soundfile as sf
     audio = griffin_lim(spec_out)
     audio_file = f'{out_dir}/{args.file_out}.wav'
     sf.write(audio_file, audio / np.max(audio), samplerate=SAMPLING_RATE)

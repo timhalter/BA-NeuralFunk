@@ -1,22 +1,14 @@
 import argparse
 import os
 import pickle as pkl
-import random
-import shlex
-import subprocess
 from glob import glob
 from random import shuffle
-from shutil import copyfile
 
 import joblib
 import librosa
 import librosa.display
-import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
 import soundfile as sf
-from griffin_lim import griffin_lim
-from sklearn.manifold import TSNE
 
 data_dir = '../data/samples/raw_samples'
 target_dir = '../data/samples/dataset/'

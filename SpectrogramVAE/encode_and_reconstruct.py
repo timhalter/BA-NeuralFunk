@@ -5,10 +5,7 @@ import argparse
 import json
 import os
 import sys
-import time
-from random import shuffle
 
-import joblib
 import librosa
 import librosa.display
 import matplotlib.pyplot as plt
@@ -119,10 +116,6 @@ def main():
     else:
         melspecs, filenames = load_specs(filename='dataset.pkl', return_filenames=True)
         melspecs = (np.float32(melspecs) + 80.0) / 80.0
-        # melspecs = 80.0*(np.random.random((10000,128,126))-1.0)
-
-    # print(melspecs[0].shape)
-    # print(np.expand_dims(np.expand_dims(melspecs[0], 0), 3).shape)
 
     if not os.path.exists(args.logdir):
         os.makedirs(args.logdir)
@@ -269,24 +262,6 @@ def main():
                             # Write to file
                             librosa.output.write_wav(dataset_filename, y_tmp, sr, norm=True)
                             np.save(dataset_filename_emb, embedding[k])
-
-                            # # Also plot reconstruction
-                            # melspec = (np.squeeze(output[k]) - 1.0) * 80.0
-                            # plt.figure()
-                            # ax1 = plt.subplot(2, 1, 1)
-                            #
-                            # librosa.display.specshow((melspecs[step * batch_size + k] - 1.0) * 80.0, sr=SAMPLING_RATE, y_axis='mel',
-                            #                          x_axis='time',
-                            #                          hop_length=HOP_LENGTH)
-                            # plt.title('Original: ' + name_no_path)
-                            # ax2 = plt.subplot(2, 1, 2, sharex=ax1)
-                            # librosa.display.specshow(melspec, sr=SAMPLING_RATE, y_axis='mel', x_axis='time',
-                            #                          hop_length=HOP_LENGTH)
-                            # plt.title('Reconstruction')
-                            # plt.tight_layout()
-                            # plt.savefig(f'{out_dir_emb}/{filename_counter} - {name_no_path}.png')
-                            # plt.close()
-
                             filename_counter += 1
 
                         except:
