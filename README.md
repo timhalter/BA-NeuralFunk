@@ -24,6 +24,16 @@ Download and save in a raw_samples directory (see project structure above)
 * [Drumkit](https://s3-ap-northeast-1.amazonaws.com/codepen-dev/drumkit_dataset.zip)
 * [NeuroFunk Sample Pack](https://www.ghosthack.de/free_sample_packs/neurofunk-sample-pack/)
 
+## Local anaconda environment setup
+Create new environment with Python 3.7:
+* ```conda create --name py37 python=3.7```
+Activate new environment:
+* ```activate py37```
+Navigate to project directory:
+* ```cd <path>/SpectrogramVAE
+Install requirements:
+* ```pip install -r requirements.txt```
+
 ## Preprocessing
 ```python preprocessing.py --data_dir <datadir> --target_dir <targetdir>```
 ## Training
