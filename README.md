@@ -8,22 +8,15 @@ Project structure:
 BA_NeuralFunk  
 │
 └───SpectrogramVAE
-│   
-└───WaveNet
 │
 │
-data
-│
-└───logdir
-│
-└───samples
+└───data
 │   │
-│   └───dataset
-│   │   │   sample1.wav
-│   │   │   sample1.npy
-│   │   │   ...
-│   │
-│   └───raw_samples
+│   └───logdir
+│   │ 
+│   └───samples
+│   │   │ 
+│   │   └───raw_samples
 
 ```
 ## Preprocessing
