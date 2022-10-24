@@ -27,8 +27,8 @@ class SpectrogramReader(object):
         self.specs = specs
         self.coord = coord
         self.threads = []
-        self.spec_placeholder = tf.placeholder(dtype=tf.float32, shape=None)
-        self.queue = tf.PaddingFIFOQueue(queue_size,
+        self.spec_placeholder = tf.compat.v1.placeholder(dtype=tf.float32, shape=None)
+        self.queue = tf.queue.PaddingFIFOQueue(queue_size,
                                          ['float32'],
                                          shapes=[(128, 126, 1)])
         self.enqueue = self.queue.enqueue([self.spec_placeholder])

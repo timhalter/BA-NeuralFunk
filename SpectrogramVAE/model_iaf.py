@@ -26,7 +26,7 @@ def upsample(value, name, factor=[2, 2]):
 def upsample2(value, name, output_shape):
     size = [int(output_shape[1]), int(output_shape[2])]
     with tf.name_scope(name):
-        out = tf.image.resize_bilinear(value, size=size, align_corners=None, name=None)
+        out = tf.compat.v1.image.resize_bilinear(value, size=size, align_corners=None, name=None)
         return out
 
 
@@ -99,16 +99,16 @@ class VAEModel(object):
 
         var = dict()
 
-        with tf.variable_scope('VAE'):
+        with tf.compat.v1.variable_scope('VAE'):
 
-            with tf.variable_scope("Encoder"):
+            with tf.compat.v1.variable_scope("Encoder"):
 
                 var['encoder_conv'] = list()
-                with tf.variable_scope('conv_stack'):
+                with tf.compat.v1.variable_scope('conv_stack'):
 
                     for l in range(self.layers_enc):
 
-                        with tf.variable_scope('layer{}'.format(l)):
+                        with tf.compat.v1.variable_scope('layer{}'.format(l)):
                             current = dict()
 
                             if l == 0:
@@ -123,7 +123,7 @@ class VAEModel(object):
                             #                                               [channels_out])
                             var['encoder_conv'].append(current)
 
-                with tf.variable_scope('fully_connected'):
+                with tf.compat.v1.variable_scope('fully_connected'):
 
                     layer = dict()
 
@@ -143,12 +143,12 @@ class VAEModel(object):
 
                     var['encoder_fc'] = layer
 
-            with tf.variable_scope("IAF"):
+            with tf.compat.v1.variable_scope("IAF"):
 
                 var['iaf_flows'] = list()
                 for l in range(self.param['iaf_flow_length']):
 
-                    with tf.variable_scope('layer{}'.format(l)):
+                    with tf.compat.v1.variable_scope('layer{}'.format(l)):
 
                         layer = dict()
 
@@ -161,7 +161,7 @@ class VAEModel(object):
                         flow_variables = list()
                         # Flow parameters from hidden state (m and s parameters for IAF)
                         for j in range(self.param['dim_latent']):
-                            with tf.variable_scope('flow_layer{}'.format(j)):
+                            with tf.compat.v1.variable_scope('flow_layer{}'.format(j)):
 
                                 flow_layer = dict()
 
@@ -186,9 +186,9 @@ class VAEModel(object):
                         var['iaf_flows'].append(layer)
 
 
-            with tf.variable_scope("Decoder"):
+            with tf.compat.v1.variable_scope("Decoder"):
 
-                with tf.variable_scope('fully_connected'):
+                with tf.compat.v1.variable_scope('fully_connected'):
                     layer = dict()
 
                     layer['W_z'] = create_variable("W_z",
@@ -199,10 +199,10 @@ class VAEModel(object):
                     var['decoder_fc'] = layer
 
                 var['decoder_deconv'] = list()
-                with tf.variable_scope('deconv_stack'):
+                with tf.compat.v1.variable_scope('deconv_stack'):
 
                     for l in range(self.layers_enc):
-                        with tf.variable_scope('layer{}'.format(l)):
+                        with tf.compat.v1.variable_scope('layer{}'.format(l)):
                             current = dict()
 
                             channels_in = self.param['conv_channels'][-1 - l]
@@ -242,7 +242,7 @@ class VAEModel(object):
         mu_logvar_hidden = tf.nn.dropout(self.activation(tf.matmul(encoder_hidden,
                                                                    self.variables['encoder_fc']['W_z0'])
                                                          + self.variables['encoder_fc']['b_z0']),
-                                         keep_prob=keep_prob)
+                                         rate=1 - keep_prob)
 
         # print(mu_logvar_hidden)
 
@@ -257,7 +257,7 @@ class VAEModel(object):
         encoder_std = tf.exp(0.5 * encoder_logvar)
 
         # Sample epsilon
-        epsilon = tf.random_normal(tf.shape(encoder_std), name='epsilon')
+        epsilon = tf.random.normal(tf.shape(encoder_std), name='epsilon')
 
         if encode:
             z0 = tf.identity(encoder_mu, name='LatentZ0')
@@ -341,7 +341,7 @@ class VAEModel(object):
         # Fully connected
         decoder_hidden = tf.nn.dropout(self.activation(tf.matmul(z, self.variables['decoder_fc']['W_z'])
                                                        + self.variables['decoder_fc']['b_z']),
-                                       keep_prob=keep_prob)
+                                       rate=1-keep_prob)
 
         # print(decoder_hidden)
 

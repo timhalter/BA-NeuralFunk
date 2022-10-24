@@ -35,7 +35,7 @@ def inv_magphase(mag, phase_angle):
 
 def _build_mel_basis():
     n_fft = N_FFT
-    return librosa.filters.mel(SAMPLING_RATE, n_fft, n_mels=MELSPEC_BANDS)
+    return librosa.filters.mel(sr=SAMPLING_RATE, n_fft=n_fft, n_mels=MELSPEC_BANDS)
 
 
 def griffin_lim(melspec, num_iters=10, phase_angle=0.0, n_fft=N_FFT, hop=HOP_LENGTH):

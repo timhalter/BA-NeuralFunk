@@ -9,7 +9,7 @@ import preprocessing
 
 def get_arguments():
     parser = argparse.ArgumentParser(description='WaveNet example network')
-    parser.add_argument('--audio_dir', type=str, default="../../data/samples/raw_samples",
+    parser.add_argument('--audio_dir', type=str, default="../data/samples/raw_samples",
                     help='The target directory for the generated dataset.')     
     parser.add_argument('--combine', type=bool, default=False,
                         help='Combination mode.')

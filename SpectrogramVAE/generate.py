@@ -129,12 +129,12 @@ def main():
                    batch_size)
 
     # Set up session
-    sess = tf.Session(config=tf.ConfigProto(log_device_placement=False))
-    init = tf.global_variables_initializer()
+    sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(log_device_placement=False))
+    init = tf.compat.v1.global_variables_initializer()
     sess.run(init)
 
     # Saver for storing checkpoints of the model.
-    saver = tf.train.Saver(var_list=tf.trainable_variables(), max_to_keep=max_checkpoints)
+    saver = tf.compat.v1.train.Saver(var_list=tf.compat.v1.trainable_variables(), max_to_keep=max_checkpoints)
 
     try:
         saved_global_step = load(saver, sess, args.logdir)
