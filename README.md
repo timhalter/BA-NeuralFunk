@@ -45,11 +45,12 @@ Download and save in a raw_samples directory (see project structure above)
 ```python encode_and_reconstruct.py -logdir <logdir> --encode_full true```
 ## Generating samples
 * Sampling from latent space:\
-```python generate.py --logdir <logdir> --file_out <filename>```
-* Sinlge input file:\
-```python generate.py --logdir <logdir> --file_in <filename>```
-* Multiple input files:\
-```python generate.py --logdir <logdir> --file_in <list_of_files> --file_out <filename>```
+```python generate_experiments.py --audio_dir <path> --random True```
+* Combine multiple samples either random or from one or two specific categories:\
+```python generate_experiments.py --audio_dir <path> --combine True```\
+```python generate_experiments.py --audio_dir <path> --combine True --cat1 0 --cat2 1```
+* Audio reconstruction:\
+```python generate_experiments.py --audio_dir <path> --reconstruct True```
 
 
 
