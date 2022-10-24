@@ -101,7 +101,7 @@ def generate_combined(audio_files, audio_tobecombined=None, prefix="combination"
             dir_arg += f'"{file}" '
         
         filename = prefix + str(k)
-        command_line = f"python generate.py --logdir='../../data/logdir' --file_in {dir_arg} --file_out {filename}"
+        command_line = f"python generate.py --logdir='../data/logdir' --file_in {dir_arg} --file_out {filename}"
         
         args = shlex.split(command_line)        
         subprocess.call(args)
@@ -109,7 +109,7 @@ def generate_combined(audio_files, audio_tobecombined=None, prefix="combination"
 def generate_random(outputs=2):
     # Generate a bunch of random files, based on latent space sampling, using the generate.py script
     for k in range(outputs):            
-        command_line = f"python generate.py --logdir='../../data/logdir' --file_in  --file_out sampled{k}"
+        command_line = f"python generate.py --logdir='../data/logdir' --file_in  --file_out sampled{k}"
         args = shlex.split(command_line)        
         subprocess.call(args)
 
@@ -118,14 +118,14 @@ def generate_single_reconstructed(audio_files, outputs=2):
     for k in range(outputs):
         file = random.choice(audio_files)
         file_formatted = "'" + file + "'"
-        command_line = f"python encode_and_reconstruct.py --logdir='../../data/logdir' --audio_file {file_formatted}"
+        command_line = f"python encode_and_reconstruct.py --logdir='../data/logdir' --audio_file {file_formatted}"
         args = shlex.split(command_line)        
         subprocess.call(args)
 
 def find_similar_samples(audio_file):
     # Find similar generated samples based on an existing sample
     file_formatted = "'" + audio_file + "'"
-    command_line = f"python find_similar.py --logdir ../../data/logdir --target {file_formatted} --sample_dirs ../../data/samples/generated"
+    command_line = f"python find_similar.py --logdir ../data/logdir --target {file_formatted} --sample_dirs ../data/samples/generated"
     args = shlex.split(command_line)        
     subprocess.call(args)
 

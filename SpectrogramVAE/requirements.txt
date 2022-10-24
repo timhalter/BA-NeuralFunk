@@ -1,5 +1,3 @@
-numpy
-joblib
 seaborn
 librosa
 matplotlib
