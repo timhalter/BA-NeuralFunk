@@ -1,23 +1,25 @@
 import argparse
+import os
+import pickle as pkl
+import random
+import shlex
+import subprocess
+from glob import glob
+from random import shuffle
+from shutil import copyfile
+
+import joblib
 import librosa
 import librosa.display
-import numpy as np
-from glob import glob
-import os
-import random
-from random import shuffle
-import pickle as pkl
-import joblib
 import matplotlib.pyplot as plt
-import shlex, subprocess
+import numpy as np
 import seaborn as sns
-from sklearn.manifold import TSNE
-from shutil import copyfile
-from griffin_lim import griffin_lim
 import soundfile as sf
+from griffin_lim import griffin_lim
+from sklearn.manifold import TSNE
 
-DATA_DIRECTORY = '../../data/samples/raw_samples'
-TARGET_DIRECTORY = '../../data/samples/dataset/samples_spec_dataset/'
+data_dir = '../../data/samples/raw_samples'
+target_dir = '../../data/samples/dataset/'
 N_FFT = 1024
 HOP_LENGTH = 256 
 SAMPLING_RATE = 16000
@@ -28,9 +30,9 @@ num_samples = int(sample_secs * SAMPLING_RATE)
 
 def get_arguments():
     parser = argparse.ArgumentParser(description='WaveNet example network')
-    parser.add_argument('--data_dir', type=str, default=DATA_DIRECTORY,
+    parser.add_argument('--data_dir', type=str, default=data_dir,
                         help='The directory containing the raw audio samples.')
-    parser.add_argument('--target_dir', type=str, default=TARGET_DIRECTORY,
+    parser.add_argument('--target_dir', type=str, default=target_dir,
                         help='The target directory for the generated dataset.')
     return parser.parse_args()
 
@@ -69,11 +71,8 @@ def get_melspec(filepath_or_audio, hop_length=HOP_LENGTH, n_mels=MELSPEC_BANDS, 
         
     return S, length_ratio
 
-def get_audio_dirs():
-    # drumkit_dirs = glob("../../data/Samples/drumkit_dataset/*")
-    # ghosthack_dirs = glob("../../data/Samples/Ghosthack_Neurofunk_FreePack/*")
-    # sample_dirs = drumkit_dirs + ghosthack_dirs
-    return glob(DATA_DIRECTORY + "/*/", recursive=True)
+def get_audio_dirs(dir):
+    return glob(dir + "/*/", recursive=True)
 
 def get_audio_files(sample_dirs):
     audio_files = []
@@ -139,7 +138,7 @@ def create_dataset(audio_files):
 
     joblib.dump(dataset_short, 'dataset_small.pkl')
 
-def build_dataset(audio_files):
+def build_dataset(audio_files, target_directory):
     # Build dataset for Wavenet training
     sample_length_sec = 3.0
     num_samples_dataset = int(sample_length_sec * SAMPLING_RATE)
@@ -167,8 +166,8 @@ def build_dataset(audio_files):
 
             filename = os.path.splitext(os.path.split(filename)[1])[0]
 
-            dataset_filename = TARGET_DIRECTORY + str(counter) + ' - ' + filename + '.wav'
-            dataset_filename_spec = TARGET_DIRECTORY + str(counter) + ' - ' + filename + '.npy'
+            dataset_filename = target_directory + str(counter) + ' - ' + filename + '.wav'
+            dataset_filename_spec = target_directory + str(counter) + ' - ' + filename + '.npy'
 
             sf.write(dataset_filename, y_tmp, samplerate=sr) #, norm=True -> not available in SoundFile
             np.save(dataset_filename_spec,spec)
@@ -178,118 +177,29 @@ def build_dataset(audio_files):
         except:
             pass
 
-def emb_similarity_search():
-    emb_dir = '../SpectrogramVAE-master/logdir/embeddings-9999'
-
-    emb_files = []
-    for dirName, subdirList, fileList in os.walk(emb_dir, topdown=False):
-            for fname in fileList:
-                if os.path.splitext(fname)[1] in ['.npy']:
-                    emb_files.append('%s/%s' % (dirName,fname))
-    len(emb_files)
-
-    emb_mat = np.zeros((len(emb_files), 64))
-    emb_cats = []
-    emb_cat_names = []
-    categories = [
-        ['kick'],
-        ['snare', 'snr'],
-        ['hat', 'hh'],
-        ['tom'],
-        ['clap'],
-        ['bass'],
-        ['drum'],
-        ['fx','riser'],
-        ['pad'],
-        ['reece']
-    ]
-
-    counter = 0
-    for k, file in enumerate(emb_files):
-        cat_found = False
-        for j, cat in enumerate(categories):
-            cond = any([s in file.lower() for s in cat])
-            if cond:
-                emb_mat[counter] = np.load(file)
-                emb_cats.append(j+1)
-                emb_cat_names.append(cat[0])
-                counter+=1
-                cat_found = True
-                break
-        if not cat_found: 
-            emb_mat[counter] = np.load(file)
-            emb_cats.append(0)
-            emb_cat_names.append('Other')
-            counter+=1
-    emb_mat = emb_mat[:counter]
-    
-
-    tsne = TSNE(n_components=2, verbose=1, perplexity=30, n_iter=300)
-    tsne_results = tsne.fit_transform(emb_mat)
-
-
-    fig1 = plt.figure(figsize=(12, 12))
-    fig1.add_subplot(111)
-    # cmap = sns.cubehelix_palette(dark=.3, light=.8, as_cmap=True)
-    ax = sns.scatterplot(x=tsne_results[:,0], y=tsne_results[:,1], hue=emb_cat_names, s=50, marker=".")
-
-    fig2 = plt.figure(figsize=(12, 12))
-    fig2.add_subplot(111)
-    # cmap = sns.cubehelix_palette(dark=.3, light=.8, as_cmap=True)
-    ax = sns.scatterplot(x=tsne_results[:,0], y=tsne_results[:,1], hue=emb_cat_names, s=2, marker="x")
-
-def generate_combined(audio_files):
-    # Generate a bunch of random files using the generate.py script
-    for k in range(0,20):
-        
-        # How many files to combine?
-        num_in = np.random.randint(2,4)
-        
-        #Pick random files
-        files_in = []
-        for j in range(num_in):
-            files_in.append(random.choice(audio_files))
-            
-        dir_arg = ''
-        for file in files_in:
-            dir_arg += f'"{file}" '
-            
-        command_line = f"python generate.py --logdir='../SpectrogramVAE-master/logdir' --file_in {dir_arg} --file_out random{k}"
-        
-        args = shlex.split(command_line)        
-        subprocess.call(args)
-
-def generate_random():
-    # Generate a bunch of random files, based on latent space sampling, using the generate.py script
-    for k in range(20):            
-        command_line = f"python generate.py --logdir='../SpectrogramVAE-master/logdir' --file_in  --file_out sampled{k}"
-        args = shlex.split(command_line)        
-        subprocess.call(args)
-
-def generate_single_reconstructed(audio_files):
-    # Einzelne samples dekodieren und rekonstruieren
-    for k in range(20):
-        file = random.choice(audio_files)
-        file_formatted = "'" + file + "'"
-        command_line = f"python ../SpectrogramVAE-master/encode_and_reconstruct.py --logdir='../SpectrogramVAE-master/logdir' --audio_file {file_formatted}"
-        args = shlex.split(command_line)        
-        subprocess.call(args)
-
-def find_similar_samples(audio_files):
-    # Find similar generated samples based on an existing sample
-    for k in range(1):
-        # file = random.choice(audio_files)
-        file = audio_files[k]
-        file_formatted = "'" + file + "'"
-        command_line = f"python ../SpectrogramVAE-master/find_similar.py --logdir ../SpectrogramVAE-master/logdir --target {file_formatted} --sample_dirs ../../data/Samples/generated"
-        args = shlex.split(command_line)        
-        subprocess.call(args)
 
 def main():
-    sample_dirs = get_audio_dirs()
+    args = get_arguments()
+
+    print("Loading audio directories...")
+
+    sample_dirs = get_audio_dirs(args.data_dir)
+
+    print("Audio directories loaded!")
+    print("Loading audio files...")
+
     audio_files = get_audio_files(sample_dirs)
+
+    print("Audio files loaded!")
+    print("Creating dataset...")
     create_dataset(audio_files)
-    build_dataset(audio_files)
+
+    print("Dataset created!")
+    print("Build dataset...")
+
+    build_dataset(audio_files, args.target_dir)
+    
+    print("Dataset built! Finished!")
 
 if __name__ == '__main__':
     main()
