@@ -1,25 +1,24 @@
 import matplotlib as mpl
+
 mpl.use('Agg')
-import matplotlib.pyplot as plt
-import tensorflow as tf
+import argparse
+import json
 import os
 import sys
 import time
-import joblib
 from random import shuffle
-import numpy as np
-import argparse
-import json
 
+import joblib
 import librosa
 import librosa.display
+import matplotlib.pyplot as plt
+import numpy as np
 import soundfile as sf
-
-
+import tensorflow as tf
+from griffin_lim import griffin_lim
+from model_iaf import *
 from spec_reader import *
 from util import *
-from model_iaf import *
-from griffin_lim import griffin_lim
 
 with open('audio_params.json', 'r') as f:
     param = json.load(f)
@@ -38,7 +37,7 @@ checkpoint_every = 500
 batch_size = 1
 model_params = 'params.json'
 num_data = -1
-encode_batch_size = 1 # was 128
+encode_batch_size = 128
 dataset_file = 'dataset.pkl'
 
 def get_arguments():
@@ -161,12 +160,12 @@ def main():
                    batch_size)
 
     # Set up session
-    sess = tf.Session(config=tf.ConfigProto(log_device_placement=False))
-    init = tf.global_variables_initializer()
+    sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(log_device_placement=False))
+    init = tf.compat.v1.global_variables_initializer()
     sess.run(init)
 
     # Saver for loading checkpoints of the model.
-    saver = tf.train.Saver(var_list=tf.trainable_variables(), max_to_keep=max_checkpoints)
+    saver = tf.compat.v1.train.Saver(var_list=tf.compat.v1.trainable_variables(), max_to_keep=max_checkpoints)
 
     try:
         saved_global_step = load(saver, sess, args.logdir)
