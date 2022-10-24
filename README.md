@@ -30,7 +30,7 @@ Create new environment with Python 3.7:
 Activate new environment:
 * ```activate py37```
 Navigate to project directory:
-* ```cd <path>/SpectrogramVAE
+* ```cd <path>/SpectrogramVAE```
 Install requirements:
 * ```pip install -r requirements.txt```
 
