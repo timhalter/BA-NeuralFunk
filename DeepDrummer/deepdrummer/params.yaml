@@ -1,0 +1,88 @@
+---
+audio:
+  number_repeats: 1
+  part_length: 32
+  nbr_of_lines: 5
+  sequence: ABBCCBBDCCE 
+  bpm: 101
+  sample_rate_input: 44100
+  sample_rate_output: 44100
+  pad_len: 0
+  mix_vol: 0.5
+
+
+# Samples: 
+# HORN, Snare, PIANO, Kick, Rim, Tom, Guitar, Hat Open, Hat Medium
+# Hat Closed, Bass, HiHat, ...
+
+# Klasse A bis D
+# 16 step pro Klasse
+
+# intro, verse — chorus — verse — chorus — bridge — chorus — outro
+# ABABCB
+# AABA (32-bar-form)
+
+
+audio_pattern: 
+  parts:
+    - part: A # INTRO
+      samples:
+        - sample_type: kick
+          pattern_steps: []        
+        - sample_type: snare
+          pattern_steps: []
+        - sample_type: hhclosed
+          pattern_steps: [0, 4, 8, 12, 16, 20, 24, 28]
+        - sample_type: piano
+          pattern_steps: []
+        - sample_type: horn
+          pattern_steps: []
+    - part: B # VERSE
+      samples:
+        - sample_type: kick
+          pattern_steps: [0, 3, 10, 13, 16, 19, 26, 29]        
+        - sample_type: snare
+          pattern_steps: [4, 12, 20, 28]
+        - sample_type: hhclosed
+          pattern_steps: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30]
+        - sample_type: guitar
+          pattern_steps: [0, 16]
+        - sample_type: horn
+          pattern_steps: [10]
+    - part: C # CHORUS
+      samples:
+        - sample_type: kick
+          pattern_steps: [0, 1, 7, 10, 13, 16, 17, 23, 26, 29]
+        - sample_type: snare
+          pattern_steps: [4, 12, 20, 28]
+        - sample_type: hhclosed
+          pattern_steps: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30]
+        - sample_type: guitar
+          pattern_steps: [0, 16]
+        - sample_type: piano
+          pattern_steps: [8]
+    - part: D # BRIDGE
+      samples:
+        - sample_type: kick
+          pattern_steps: [0, 8, 16, 24]        
+        - sample_type: snare
+          pattern_steps: [4, 11, 20, 27]
+        - sample_type: hhclosed 
+          pattern_steps: [0, 2, 5, 7, 8, 10, 12, 14, 16, 18, 21, 23, 24, 26, 28, 30]
+        - sample_type: guitar
+          pattern_steps: [4, 20]
+        - sample_type: piano
+          pattern_steps: [4, 20]
+    - part: E # OUTRO
+      samples:
+        - sample_type: kick
+          pattern_steps: [0, 3, 10, 13, 16, 19, 26, 29]        
+        - sample_type: snare
+          pattern_steps: [4, 12, 20, 28]
+        - sample_type: hhclosed
+          pattern_steps: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30]
+        - sample_type: guitar
+          pattern_steps: []
+        - sample_type: piano
+          pattern_steps: []
+... 
