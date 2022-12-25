@@ -7,7 +7,7 @@ setup(
     version='1.0',
     packages=[
         'deepdrummer',
-        'deepdrummer.webserver',
+        #'deepdrummer.webserver',
     ],
     install_requires=[
         'numpy',
@@ -18,6 +18,7 @@ setup(
         'sounddevice',
         'scipy',
         'matplotlib',
-        'pyyaml'
+        'pyyaml',
+        'librosa'
     ]
 )
