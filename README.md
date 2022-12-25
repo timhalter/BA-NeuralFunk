@@ -5,18 +5,30 @@ This repository cointains all code-based files and documentation which contribut
 Project structure:
 
 ```
-BA_NeuralFunk  
+BA_NeuralFunk
+|
 │
+└───DeepDrummer
+│   │ 
+│   └───samples
+│   │ 
+│   └───save_data
+│       │ 
+│       └───good
+│       │ 
+│       └───bad
+│
+|
 └───SpectrogramVAE
 │
 │
 └───data
-│   │
-│   └───logdir
-│   │ 
-│   └───samples
-│   │   │ 
-│   │   └───raw_samples
+    │
+    └───logdir
+    │ 
+    └───samples
+        │ 
+        └───raw_samples
 
 ```
 ## Samples
