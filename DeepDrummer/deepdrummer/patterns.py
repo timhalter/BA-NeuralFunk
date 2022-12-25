@@ -119,9 +119,8 @@ class Pattern:
                 out += '\n'
 
         return out
-
-#TODO params 
-    def render(self):  # num_repeats=4, bpm=101, sr=44100, pad_len=1, mix_vol=0.5
+ 
+    def render(self):
         """
         Render the pattern using audio samples
         Produces a numpy array
