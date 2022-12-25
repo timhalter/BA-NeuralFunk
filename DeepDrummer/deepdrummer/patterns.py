@@ -38,13 +38,6 @@ class Pattern:
         self.num_steps = num_steps
         self.num_instrs = len(samples[0])
         self.instr_names = samples
-        #print(instruments)
-        # for instr in instr_names:
-        #     print(instr)
-
-        # for i in range(0, parts):
-        #     self.instr_names.append(instruments)
-        # 
 
         # Internal numpy array to store the pattern
         if init:
@@ -134,13 +127,11 @@ class Pattern:
         Produces a numpy array
         """
         audio_params,_ = get_audio_param_bp()
-        num_repeats = audio_params['number_repeats']
         bpm = audio_params['bpm']
-        sr = audio_params['sample_rate_output']
-        pad_len = audio_params['pad_len']
         mix_vol=audio_params['mix_vol']
         part_length = audio_params['part_length']
         nbr_of_parts = len(audio_params['sequence'])
+        sr = 44100
 
         # Load the samples partwise
         samples = []
@@ -156,7 +147,7 @@ class Pattern:
         note_len = beat_len / steps_per_beat
 
         # Allocate a buffer to generate the audio
-        pat_len = self.num_steps * note_len + pad_len
+        pat_len = self.num_steps * note_len
         num_samples = int(pat_len * sr)
         audio = np.zeros(shape=num_samples, dtype=np.float32)
 
@@ -203,7 +194,6 @@ class SampleManager:
 
             for file_root, dirs, files in os.walk(root_path, topdown=False):
                 for name in files:
-                    #name, ext = name.split('.')
                     name, ext = name.split('.',1)
                     if ext != 'wav':
                         continue
@@ -245,7 +235,8 @@ class SampleManager:
         path = self.get_path(name)
         data, sr = sf.read(path)
         data = librosa.resample(data, orig_sr=sr, target_sr=44100)
-        # assert sr == get_input_sample_rate() # 16000 44100  #TODO sample rate input
+
+        # assert sr == 44100
 
         # Mix down to mono if necessary
         if len(data.shape) == 2 and data.shape[1] == 2:
@@ -297,7 +288,7 @@ def mix_sample(audio, sample, start_idx):
     Mix an audio sample into an audio buffer in-place
     """
 
-    smp_len = sample.shape[0] # = 48000
+    smp_len = sample.shape[0]
 
     end_idx = start_idx + smp_len
     if end_idx > audio.shape[-1]:
@@ -390,15 +381,8 @@ def mutate_pattern(pat, fotf=False, pattern_bp=None):
     #new_pattern.mutate_samples()
 
     audio_details, audio_pattern_bp = get_audio_param_bp()
-    part_length = int(audio_details['part_length']) # 16
-    part_count = len(audio_details['sequence']) # 6
-
-    # Part A  0 - 15
-    # Part B 16 - 31
-    # Part A 32 - 47
-    # Part B 48 - 63
-    # Part C 64 - 79
-    # Part B 80 - 95
+    part_length = int(audio_details['part_length'])
+    part_count = len(audio_details['sequence'])
 
     if fotf:
         step_counter = 0
