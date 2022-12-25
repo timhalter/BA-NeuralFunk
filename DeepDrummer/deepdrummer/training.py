@@ -24,23 +24,23 @@ def load_audio_files(path, single_bar=True):
                 continue
             name = os.path.join(file_root, name)
             data, sr = sf.read(name)
-            resampled_data = librosa.resample(data, orig_sr=sr, target_sr=44100)
+            data = librosa.resample(data, orig_sr=sr, target_sr=44100)
             
             # assert sr == 44100
 
-            if len(resampled_data.shape) == 2 and resampled_data.shape[1] == 2:
-                resampled_data = 0.5 * (resampled_data[:, 0] + resampled_data[:, 1])
+            if len(data.shape) == 2 and data.shape[1] == 2:
+                data = 0.5 * (data[:, 0] + data[:, 1])
 
             # We only use the 2nd bar out of 4
             if single_bar:
-                if resampled_data.shape[0] >= 4*44100:
-                    resampled_data = resampled_data[2*44100:4*44100]
+                if data.shape[0] >= 4*44100:
+                    data = data[2*44100:4*44100]
                 else:
-                    resampled_data = resampled_data[:2*44100]
+                    data = data[:2*44100]
 
-            resampled_data = resampled_data.astype(np.float32)
-            resampled_data = torch.from_numpy(resampled_data).unsqueeze(dim=0)
-            audios.append(resampled_data)
+            data = data.astype(np.float32)
+            data = torch.from_numpy(data).unsqueeze(dim=0)
+            audios.append(data)
 
     return audios
 
