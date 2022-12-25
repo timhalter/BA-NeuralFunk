@@ -1,27 +1,13 @@
 ---
 audio:
-  number_repeats: 1
   part_length: 32
   nbr_of_lines: 5
   sequence: ABBCCBBDCCE 
   bpm: 101
-  sample_rate_input: 44100
-  sample_rate_output: 44100
-  pad_len: 0
   mix_vol: 0.5
 
-
-# Samples: 
-# HORN, Snare, PIANO, Kick, Rim, Tom, Guitar, Hat Open, Hat Medium
-# Hat Closed, Bass, HiHat, ...
-
-# Klasse A bis D
-# 16 step pro Klasse
-
-# intro, verse — chorus — verse — chorus — bridge — chorus — outro
-# ABABCB
-# AABA (32-bar-form)
-
+# Samples: kick, snare, hhclosed, guitar, horn, piano
+# Sequence Examples: ABBCCBBDCCE 
 
 audio_pattern: 
   parts:
